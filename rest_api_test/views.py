@@ -28,34 +28,29 @@ class IndexView(View):
     def post(self, request):
         # print(request.headers)
         # print(request.body)
-        # print(request.FILES)
+        print(request.FILES)
         
         files = request.FILES['file']
         path = default_storage.save('./uploads/test.onnx', ContentFile(files.read()))
 
         cmd = "python -m onnx_connx "+ "uploads/test.onnx"
 
-        # file_name = files[0].name
-        # print(file_name)
-        # destination = open(os.path.join("./upload", file_name), 'wb+')
-        # path = "python -m onnx_connx "+ "upload/"+file_name
         out = subprocess.run(cmd, shell=True, check= True,capture_output=True,text=True)
 
         shutil.make_archive("connx","zip","out")
 
-        name = "model.connx"
+        
 
         # path = "out/model.connx"
         path = "out.zip"
+        name = "out.zip"
 
         File_exists = os.path.exists(path)
         if File_exists == True:
             file = open(path, 'rb')
             response = FileResponse(file)
-
-            response[
-                'Content-Disposition'] = 'attachment;filename="%s"' % urlquote(
-                    name)
+            response['Content-Type'] = 'application/x-zip-compressed'
+            response['Content-Disposition'] = 'attachment;filename="%s"' % urlquote(name)
 
             return response
 
