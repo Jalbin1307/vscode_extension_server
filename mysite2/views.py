@@ -27,9 +27,19 @@ class IndexView(View):
 
     def post(self, request):
         
+        if os.path.exists('./out'):
+            shutil.rmtree('./out')
+        
+        if os.path.exists('./uploads'):
+            shutil.rmtree('./uploads')
+
+        os.mkdir('./uploads')
+
         files = request.FILES['file']
         path = default_storage.save('./uploads/test.txt', ContentFile(files.read()))
 
+
+        os.mkdir('./out')
         result_path = './out/TEST.txt'
         upper = ''
         with open(path, 'r',) as f:
