@@ -20,5 +20,5 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest_api_test/',include('rest_api_test.urls')),
-    # path('',views.IndexView.as_view(), name="index"),
+    path('',views.IndexView.as_view(), name="index"),
 ]
