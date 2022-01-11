@@ -25,31 +25,34 @@ class IndexView(View):
         return JsonResponse(dummy_data)
 
 
+    @csrf_exempt
     def post(self, request):
-        # print(request.headers)
-        # print(request.body)
-        print(request.FILES)
+        if os.path.exists('./out'):
+            shutil.rmtree('./out')
+        
+        if os.path.exists('./uploads'):
+            shutil.rmtree('./uploads')
+
+        os.mkdir('./uploads')
+        os.mkdir('./out')
         
         files = request.FILES['file']
         path = default_storage.save('./uploads/test.onnx', ContentFile(files.read()))
-
+         
         cmd = "python -m onnx_connx "+ "uploads/test.onnx"
-
         out = subprocess.run(cmd, shell=True, check= True,capture_output=True,text=True)
 
-        shutil.make_archive("connx","zip","out")
-
-        
+        z = shutil.make_archive("connx","zip","out")
 
         # path = "out/model.connx"
-        path = "out.zip"
-        name = "out.zip"
+        path = "connx.zip"
+        name = "connx.zip"
 
+    
         File_exists = os.path.exists(path)
         if File_exists == True:
-            file = open(path, 'rb')
-            response = FileResponse(file)
-            response['Content-Type'] = 'application/x-zip-compressed'
+            # file = open(path, 'rb')
+            response = HttpResponse(open(path,'rb'), content_type='application/zip')
             response['Content-Disposition'] = 'attachment;filename="%s"' % urlquote(name)
 
             return response
